@@ -1,0 +1,31 @@
+#Example fullerene heated from T=10 to 1000 K for 1 ps, thermostated at T=1000 K for 1 ps and kept at E=const for 1 ps
+
+units                   real
+atom_style              charge
+
+read_data               C60.data
+
+pair_style              reax/c NULL
+pair_coeff              * * ffield_reax.cho2016 C
+fix                     chg all qeq/reax 1 0.0 10.0 1.0e-6 reax/c
+
+
+thermo_style    custom  step time temp pe ke etotal press vol
+thermo          100
+
+dump            1 all cfg 250 ./c60.*.cfg mass type xs ys zs
+dump            2 all custom 250 ./c60.*.pos id type x y z
+
+timestep        0.1
+
+fix             1 all nvt temp 10 1000 10
+run             10000
+
+unfix		1
+fix		2 all nvt temp 1000 1000 10
+run		10000
+
+unfix		2
+fix		3 all nve
+run		10000 
+
