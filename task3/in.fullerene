@@ -1,0 +1,27 @@
+#Example fullerene + graphene
+
+units                   real
+atom_style              charge
+
+read_data               C60_graphene.data
+
+pair_style              reax/c NULL
+pair_coeff              * * ffield_reax.cho2016 C
+fix                     chg all qeq/reax 1 0.0 10.0 1.0e-6 reax/c
+
+
+thermo_style    custom  step time temp pe ke etotal press vol
+thermo          100
+
+dump            1 all cfg 250 ./c60.*.cfg mass type xs ys zs
+dump            2 all custom 250 ./c60.*.pos id type x y z
+
+timestep        0.1
+
+##### Make fullerene hit the graphene plane ########
+##### Some useful commands:
+#block
+#group
+#velocity
+#fix setforce
+

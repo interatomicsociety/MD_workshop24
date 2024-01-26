@@ -1,0 +1,39 @@
+#Example fullerene with different Fixes
+
+units                   real
+atom_style              charge
+
+read_data               C60.data
+
+pair_style              reax/c NULL
+pair_coeff              * * ffield_reax.cho2016 C
+fix                     chg all qeq/reax 1 0.0 10.0 1.0e-6 reax/c
+
+
+thermo_style    custom  step time temp pe ke etotal press vol
+thermo          100
+
+dump            1 all cfg 250 ./c60.*.cfg mass type xs ys zs
+dump            2 all custom 250 ./c60.*.pos id type x y z
+
+timestep        0.1
+
+################## Uncomment any fix & have fun ###################
+
+## Termostat heating from 300 to 1000 K
+#fix 1 all nvt temp 300 1000 5
+
+## Thermostat at T=1000 K + barostat at P=2000 atm (only x and y)
+#fix 2 all npt temp 1000 1000 10 x 2000.0 2000.0 10 y 2000.0 2000.0 10
+
+## Simulation at Total Energy = const
+#fix 3 all nve
+
+## Deform simulation box  
+#fix 4 all deform 1 x final 0.0 5.0
+
+run             10000
+
+
+
+

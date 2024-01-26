@@ -1,0 +1,31 @@
+#Example fullerene with external force
+
+units                   real
+atom_style              charge
+
+read_data               C60.data
+
+pair_style              reax/c NULL
+pair_coeff              * * ffield_reax.cho2016 C
+fix                     chg all qeq/reax 1 0.0 10.0 1.0e-6 reax/c
+
+
+thermo_style    custom  step time temp pe ke etotal press vol
+thermo          100
+
+dump            1 all cfg 500 ./c60.*.cfg mass type xs ys zs
+dump            2 all custom 250 ./c60.*.pos id type x y z
+
+timestep        0.1
+
+
+fix 		3 all nve
+
+## Add force F=1 (Kcal/mole)/Angstrom along OX
+fix 		4 all addforce 1 0 0
+
+run             10000
+
+
+
+
