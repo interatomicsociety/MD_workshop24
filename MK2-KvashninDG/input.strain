@@ -1,0 +1,102 @@
+
+####################################################################
+## BEFORE STARTING PLEASE CHECK ALL THE KEYWORDS IN LAMMPS MANUAL ##
+####################################################################
+
+#----------------------------------------------------------#
+#----------------------------------------------------------#
+variable        steps      equal     5000
+units           metal
+newton          on
+dimension       3
+boundary        p p p
+atom_style    atomic
+
+read_data coo.graphene # file with atomic structure coordinates
+
+lattice diamond 1.0
+
+#----------------------------------------------------------#
+# Potentials
+#----------------------------------------------------------#
+pair_style airebo 3.0
+pair_coeff * * CH.airebo C
+
+mass 1  12.011
+
+pair_modify shift yes
+neigh_modify 	every 1 delay 0 check yes
+
+#----------------------------------------------------------#
+# Define The Main Variables
+#----------------------------------------------------------#
+variable x1 equal xlo
+variable x2 equal xhi
+variable y1 equal ylo
+variable y2 equal yhi
+variable z1 equal zlo
+variable z2 equal zhi
+variable xy1 equal xy
+variable xz1 equal xz
+variable yz1 equal yz
+variable  e equal etotal
+variable Tsys equal temp
+#variable P_sys equal pzz
+
+#----------------------------------------------------------#
+# Lattice Optimization
+#----------------------------------------------------------#
+thermo 10
+compute 	_rg all gyration
+min_style 	cg
+min_modify 	line quadratic
+#----------- Cell Optimization ----------------------
+fix optcalc all box/relax aniso 0.0 dilate partial
+dump   1 all custom 10 dump.opt id type x y z
+dump_modify 1 sort id
+dump_modify	1 append yes element C
+minimize        1.0e-18 1.0e-15 5000 15000
+#thermo_style custom step etotal x1 x2 y1 y2 z1 z2
+undump 1
+uncompute _rg
+#----------------------------------------------------------#
+# Deformation
+#----------------------------------------------------------#
+
+label loop
+variable	ITER loop ${steps}
+
+thermo 10
+compute 	_rg all gyration
+min_style 	cg
+min_modify 	line quadratic
+
+change_box all  x  delta -0.01 0.01 remap units lattice
+
+fix calcdeform all box/relax iso 0.0 dilate partial
+
+#dump   2 all custom 100 deform.xyz id type x y z
+#dump_modify 2 sort id
+dump 		3 all xyz 200 out_deform.xyz 
+dump_modify	3 append yes element C
+dump_modify 3 sort id
+
+minimize        1.0e-18 1.0e-15 5000 15000
+
+##########################################################
+# Writing Output Cell Parameters
+##########################################################
+print "${ITER}     ${x1}      ${x2}   ${y1}      ${y2}   ${z1}      ${z2}    ${e}" append data_deform.txt
+print " ${ITER} ${x1} ${x2} ${e}"
+#print "Total energy $e"
+
+#undump	2
+undump	3
+unfix  calcdeform
+uncompute _rg
+next		ITER
+jump		input.strain loop
+
+
+
+
