@@ -1,0 +1,12 @@
+;
+; Include force-field
+#include "oplsaa.ff/forcefield.itp"
+
+;Include topologies
+#include "CYA.itp"
+
+[ system ]
+single CYA
+
+[ molecules ]
+CYA 1

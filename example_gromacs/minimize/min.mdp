@@ -1,0 +1,19 @@
+define                   = -DFLEXIBLE
+integrator               = steep
+nsteps                   = 100000
+
+nstenergy                = 100
+nstlog                   = 500
+nstxout-compressed       = 1000
+
+constraint-algorithm     = lincs
+constraints              = none
+
+cutoff-scheme            = Verlet
+
+coulombtype              = PME
+rcoulomb                 = 1.2
+
+vdwtype                  = Cut-off
+rvdw                     = 1.2
+DispCorr                 = EnerPres
