@@ -5,9 +5,9 @@ atom_style              charge
 
 read_data               C60.data
 
-pair_style              reax/c NULL
+pair_style              reaxff NULL
 pair_coeff              * * ffield_reax.cho2016 C
-fix                     chg all qeq/reax 1 0.0 10.0 1.0e-6 reax/c
+fix                     chg all qeq/reax 1 0.0 10.0 1.0e-6 reaxff
 
 
 thermo_style    custom  step time temp pe ke etotal press vol
